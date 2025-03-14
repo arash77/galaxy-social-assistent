@@ -37,20 +37,20 @@ jobs:
         with:
           app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: "usegalaxy-eu"
-          repositories: "galaxy-social"
+          owner: "arash77"
+          repositories: "galaxy-social-main"
 
       - name: Run python script for RSS/Atom feeds
         env:
           GALAXY_SOCIAL_BOT_TOKEN: ${{ steps.generate-token.outputs.token }}
-          REPO: "usegalaxy-eu/galaxy-social"
+          REPO: "arash77/galaxy-social-main"
           DAYS: ${{ github.event.inputs.days || '14' }}
         run: python -u app/feed_bot.py
 
       - name: Run python script for json feeds
         env:
           GALAXY_SOCIAL_BOT_TOKEN: ${{ steps.generate-token.outputs.token }}
-          REPO: "usegalaxy-eu/galaxy-social"
+          REPO: "arash77/galaxy-social-main"
         run: python -u app/json_bot.py
 
   keepalive-job:
