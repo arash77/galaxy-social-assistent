@@ -15,15 +15,18 @@ on:
         required: false
         type: boolean
 
+permissions: {}
+
 jobs:
   feed-bot:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -42,6 +45,8 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: "usegalaxy-eu"
           repositories: "galaxy-social"
+          permission-contents: write
+          permission-pull-requests: write
 
       - name: Run python script for RSS/Atom feeds
         env:
@@ -65,6 +70,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: true # needed by the git push below
 
       - name: Keep the repository alive
         run: |
