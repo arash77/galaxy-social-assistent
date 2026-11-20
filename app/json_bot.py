@@ -132,7 +132,7 @@ def main():
                 continue
 
             days_ago = entry.get("days_ago") or 0
-            if feed_list_key == "events" and days_ago > 5:
+            if feed_list_key == "events" and days_ago > 0:
                 print(f"Skipping {entry.get('title')} as it is past the date")
                 continue
 
