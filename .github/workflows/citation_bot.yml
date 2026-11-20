@@ -11,18 +11,21 @@ on:
         required: false
         default: "5"
 
+permissions: {}
+
 jobs:
   citation-bot:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.13"
           cache: "pip"
@@ -38,6 +41,8 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: "usegalaxy-eu"
           repositories: "galaxy-social"
+          permission-contents: write
+          permission-pull-requests: write
 
       - name: Run python script
         env:
