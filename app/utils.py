@@ -75,7 +75,7 @@ class utils:
             )
 
     def get_config(self, item_type):
-        return self.configs.get(item_type, [])
+        return self.configs.get(item_type) or []
 
     def process_entry(self, entry):
         title = entry.get("title")
