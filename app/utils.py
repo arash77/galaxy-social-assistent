@@ -23,6 +23,7 @@ class utils:
         if configs is None:
             raise ValueError("No config found in the file")
 
+        self.configs = configs
         self.list = configs.get(self.item_type, [])
         if not self.list:
             print(f"No {self.item_type} found in the config file")
@@ -41,16 +42,24 @@ class utils:
         if errors:
             raise ValueError("\n".join(errors))
 
-        access_token = os.environ.get("GALAXY_SOCIAL_BOT_TOKEN")
-        repo_name = os.environ.get("REPO")
-        g = Github(access_token)
-        self.repo = g.get_repo(repo_name)
-
         self.start_date = None
         days = os.environ.get("DAYS")
         if days:
             self.start_date = datetime.now().date() - timedelta(days=int(days))
             print(f"Processing items since {self.start_date}.")
+
+        self.dry_run = os.environ.get("DRY_RUN", "false").lower() == "true"
+        if self.dry_run:
+            print("Running in dry-run mode: no files or pull requests will be created, existing PRs won't be checked")
+            self.repo = None
+            self.update_existing_pr = False
+            self.existing_prs = []
+            return
+
+        access_token = os.environ.get("GALAXY_SOCIAL_BOT_TOKEN")
+        repo_name = os.environ.get("REPO")
+        g = Github(access_token)
+        self.repo = g.get_repo(repo_name)
 
         self.update_existing_pr = os.environ.get("UPDATE", "false").lower() == "true"
         if self.update_existing_pr:
@@ -63,6 +72,9 @@ class utils:
             self.existing_prs = g.search_issues(
                 f"repo:{repo_name} is:pr base:main head:{self.bot_path}"
             )
+
+    def get_config(self, item_type):
+        return self.configs.get(item_type) or []
 
     def process_entry(self, entry):
         title = entry.get("title")
@@ -77,6 +89,18 @@ class utils:
         if self.start_date and date < self.start_date:
             print(f"Skipping as it is older: {title}")
             return False
+
+        if self.dry_run:
+            for group_name, media_list in config.get("media", {}).items():
+                config_dict = {"media": media_list}
+                for key in ["mentions", "hashtags"]:
+                    for media in media_list:
+                        if config.get(key) and config[key].get(media):
+                            config_dict.setdefault(key, {})[media] = config[key][media]
+                md_config = yaml.dump(config_dict, sort_keys=False)
+                print(f"[dry-run] Would create {file_path}-{group_name}.md")
+                print(f"[dry-run] ---\n{md_config}---\n{formatted_text}")
+            return True
 
         existing_pr_issue = None
         for pr in self.existing_prs:
