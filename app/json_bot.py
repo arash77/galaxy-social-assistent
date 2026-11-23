@@ -196,10 +196,11 @@ def main():
                 )
                 continue
             if item["overridden_by"]:
-                print(
-                    f"Skipping tag feed entry {entry.get('title')}: "
-                    f"item already handled by tag feed {item['overridden_by']}"
-                )
+                if item["overridden_by"] != (feed.get("title") or url):
+                    print(
+                        f"Skipping tag feed entry {entry.get('title')}: "
+                        f"item already handled by tag feed {item['overridden_by']}"
+                    )
                 continue
 
             # Tag feeds define complete processing rules that override the
