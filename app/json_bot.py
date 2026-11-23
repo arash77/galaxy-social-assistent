@@ -309,7 +309,7 @@ def main():
             "date": item["date"],
             "rel_file_path": f"{item['folder']}/{item['file_name']}",
             "formatted_text": formatted_text,
-            "link": entry["link"],
+            "link": item["hub_link"],
         }
         utils_obj.process_entry(entry_data)
 
