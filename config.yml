@@ -208,6 +208,10 @@ tag_feeds:
       mastodon-eu-freiburg:
         - mastodon-galaxyproject
 
+    main_media_conflicts:
+      mastodon-galaxyproject:
+        - mastodon-eu-freiburg
+
     hashtags:
       mastodon-eu-freiburg:
         all:
