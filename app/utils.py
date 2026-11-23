@@ -42,11 +42,16 @@ class utils:
         if errors:
             raise ValueError("\n".join(errors))
 
+        self.start_date = None
+        days = os.environ.get("DAYS")
+        if days:
+            self.start_date = datetime.now().date() - timedelta(days=int(days))
+            print(f"Processing items since {self.start_date}.")
+
         self.dry_run = os.environ.get("DRY_RUN", "false").lower() == "true"
         if self.dry_run:
-            print("Running in dry-run mode: no files or pull requests will be created")
+            print("Running in dry-run mode: no files or pull requests will be created, existing PRs won't be checked")
             self.repo = None
-            self.start_date = None
             self.update_existing_pr = False
             self.existing_prs = []
             return
@@ -55,12 +60,6 @@ class utils:
         repo_name = os.environ.get("REPO")
         g = Github(access_token)
         self.repo = g.get_repo(repo_name)
-
-        self.start_date = None
-        days = os.environ.get("DAYS")
-        if days:
-            self.start_date = datetime.now().date() - timedelta(days=int(days))
-            print(f"Processing items since {self.start_date}.")
 
         self.update_existing_pr = os.environ.get("UPDATE", "false").lower() == "true"
         if self.update_existing_pr:
