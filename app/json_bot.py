@@ -181,9 +181,13 @@ def main():
         if media_data is None:
             raise ValueError(f"No media found in the config file for {feed} in tag_feeds")
         try:
-            tag_feed_data = feedparser.parse(url)
+            response = requests.get(url, timeout=30)
+            response.raise_for_status()
+            tag_feed_data = feedparser.parse(response.content)
+            if tag_feed_data.bozo and not tag_feed_data.entries:
+                raise ValueError(tag_feed_data.bozo_exception)
         except Exception as e:
-            print(f"Error in parsing tag feed {url}: {e}")
+            print(f"Error in parsing tag feed {url}, its rules are not applied: {e}")
             continue
 
         for entry in tag_feed_data.entries:
